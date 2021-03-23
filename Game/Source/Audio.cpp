@@ -238,6 +238,7 @@ void Audio::DeleteChannel()
 {
 	pendingToDelete = true;
 }
+// Restart channels
 bool Audio::RemoveChannel()
 {
 	if (Mix_Playing(-1) == 0)

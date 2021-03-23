@@ -52,9 +52,11 @@ private:
 	float speed = 0.1f;
 	int offsetAngle = 10;
 
+	SDL_Texture* bg;
 	SDL_Texture* laserR;
 	SDL_Texture* laserB;
 
+	iPoint dimensionBg;
 	iPoint dimensionLaserR;
 	iPoint dimensionLaserB;
 	iPoint player;

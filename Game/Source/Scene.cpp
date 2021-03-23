@@ -33,11 +33,13 @@ bool Scene::Awake()
 bool Scene::Start()
 {
 	// Load Textures and Fx
+	bg = app->tex->Load("Assets/Textures/speaker.png");
 	laserR = app->tex->Load("Assets/Textures/bullet_red.png");
 	laserB = app->tex->Load("Assets/Textures/bullet_blue.png");
 	laserFx = app->audio->LoadFx("Assets/Audio/Fx/fx_laser.wav");
 
 	// Get dimension of textures
+	SDL_QueryTexture(bg, NULL, NULL, &dimensionBg.x, &dimensionBg.y);
 	SDL_QueryTexture(laserR, NULL, NULL, &dimensionLaserR.x, &dimensionLaserR.y);
 	SDL_QueryTexture(laserB, NULL, NULL, &dimensionLaserB.x, &dimensionLaserB.y);
 
@@ -148,6 +150,9 @@ bool Scene::PostUpdate()
 {
 	bool ret = true;
 
+	// Draw background
+	app->render->DrawTexture(bg, (WINDOW_WIDTH * 0.5) - (dimensionBg.x * 0.5), (WINDOW_HIGHT * 0.5) - (dimensionBg.y * 0.5));
+
 	// Draw all bullets
 	ListItem<Bullet*>* item;
 	for (item = bullets.start; item != NULL; item = item->next)
@@ -218,6 +223,7 @@ bool Scene::CleanUp()
 {
 	LOG("Freeing scene");
 
+	app->tex->UnLoad(bg);
 	app->tex->UnLoad(laserR);
 	app->tex->UnLoad(laserB);
 

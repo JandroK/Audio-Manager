@@ -170,7 +170,7 @@ unsigned int Audio::LoadFx(const char* path)
 }
 
 // Play WAV
-bool Audio::PlayFx(unsigned int id, int repeat)
+bool Audio::PlayFx(int channel, unsigned int id, int repeat)
 {
 	bool ret = false;
 
@@ -180,14 +180,14 @@ bool Audio::PlayFx(unsigned int id, int repeat)
 	if(id > 0 && id <= fx.Count())
 	{
 		// If (channel == -1) check all channels
-		// if (Mix_Playing(channel) == 0)
-		Mix_PlayChannel(-1, fx[id - 1], repeat);
+		if (Mix_Playing(channel) == 0)
+			Mix_PlayChannel(-1, fx[id - 1], repeat);
 	}
 
 	return ret;
 }
 
-// Assign the distance and the direction to which the entity of the listener is located 
+// Assign the distance and direction to which the entity of the listener is located 
 // 0 = very close, 254 = far away, 255 = out of range (Volume = 0)
 void Audio::SetDistanceFx(int channel, int angle, uint distance, uint maxDistance)
 {

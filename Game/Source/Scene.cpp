@@ -30,10 +30,12 @@ bool Scene::Awake()
 // Called before the first frame
 bool Scene::Start()
 {
+	// Load Textures and Fx
 	laserR = app->tex->Load("Assets/Textures/bullet_red.png");
 	laserB = app->tex->Load("Assets/Textures/bullet_blue.png");
 	laserFx = app->audio->LoadFx("Assets/Audio/Fx/fx_laser.wav");
 
+	// Get dimension of textures
 	SDL_QueryTexture(laserR, NULL, NULL, &dimensionLaserR.x, &dimensionLaserR.y);
 	SDL_QueryTexture(laserB, NULL, NULL, &dimensionLaserB.x, &dimensionLaserB.y);
 
@@ -51,20 +53,42 @@ bool Scene::PreUpdate()
 // Called each loop iteration
 bool Scene::Update(float dt)
 {
-	//if(app->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT)
-	//	app->render->camera.y -= 1;
+	ListItem<Bullet*>* item;
+	if (app->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)// || app->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT)
+	{
+		AddBullet();
 
-	//if(app->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT)
-	//	app->render->camera.y += 1;
+		// Play Fx
+		for (item = bullets.start; item != NULL; item = item->next)
+		{
+			app->audio->PlayFx(item->data->channel, laserFx);
+		}
+	}
+	// Explosion bullets all direction
+	if (app->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT)
+	{
+		AddBullet();
 
-	//if(app->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
-	//	app->render->camera.x -= 1;
+		// Play Fx
+		for (item = bullets.start; item != NULL; item = item->next)
+		{
+			app->audio->PlayFx(item->data->channel, laserFx);
+		}
+	}
 
-	//if(app->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT)
-	//	app->render->camera.x += 1;
+	// Update entities positions
+	for (item = bullets.start; item != NULL; item = item->next)
+	{
+		item->data->pos.x += speed * cos(item->data->angle * PI/180);
+		item->data->pos.y += speed * sin(item->data->angle * PI/180);
+	}
 
+	// Update distance and  direction
+	for (item = bullets.start; item != NULL; item = item->next)
+	{
+		app->audio->SetDistanceFx(item->data->channel, item->data->angle, 0, 255);
+	}
 	
-
 	return true;
 }
 
@@ -73,13 +97,47 @@ bool Scene::PostUpdate()
 {
 	bool ret = true;
 
-	app->render->DrawTexture(laserR, (WINDOW_WIDTH * 0.5) - (dimensionLaserR.x * 0.5), WINDOW_HIGHT * 0.5 - (dimensionLaserR.y * 0.5));
-	app->render->DrawTexture(laserB, (WINDOW_WIDTH * 0.5) - (dimensionLaserB.x * 0.5), WINDOW_HIGHT * 0.5 - (dimensionLaserB.y * 0.5));
+	// Draw all bullets
+	ListItem<Bullet*>* item;
+	for (item = bullets.start; item != NULL; item = item->next)
+	{
+		app->render->DrawTexture(item->data->laserTex, item->data->pos.x, item->data->pos.y, 0, 1, item->data->angle);
+	}
 
 	if(app->input->GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
 		ret = false;
 
 	return ret;
+}
+
+void Scene::AddBullet()
+{
+	// Create new entity
+	Bullet* b = new Bullet;
+	bullets.Add(b);
+
+	// Assign texture
+	if (bullets.Count() % 2 == 0)
+	{
+		b->laserTex = laserR;
+		b->pos.x = (WINDOW_WIDTH * 0.5) - (dimensionLaserR.x * 0.5);
+		b->pos.y = (WINDOW_HIGHT * 0.5) - (dimensionLaserR.y * 0.5);
+	}
+	else
+	{
+		b->laserTex = laserB;
+		b->pos.x = (WINDOW_WIDTH * 0.5) - (dimensionLaserB.x * 0.5);
+		b->pos.y = (WINDOW_HIGHT * 0.5) - (dimensionLaserB.y * 0.5);
+	}
+
+	// Assign direction
+	if (bullets.Count() == 1)
+		b->angle = 0;
+	else
+		b->angle = bullets.end->prev->data->angle + 10;
+
+	// Assign new channel
+	b->channel = app->audio->SetChannel();
 }
 
 // Called before quitting
@@ -89,6 +147,8 @@ bool Scene::CleanUp()
 
 	app->tex->UnLoad(laserR);
 	app->tex->UnLoad(laserB);
+
+	bullets.Clear();
 
 	return true;
 }

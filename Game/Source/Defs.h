@@ -13,6 +13,8 @@
 #define	WINDOW_WIDTH  1280
 #define	WINDOW_HIGHT  720
 
+#define PI 3.14159265
+
 // Deletes a buffer
 #define RELEASE( x ) \
 	{						\

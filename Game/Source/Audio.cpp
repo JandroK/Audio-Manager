@@ -55,6 +55,14 @@ bool Audio::Awake(pugi::xml_node& config)
 		ret = true;
 	}
 
+	int result = Mix_AllocateChannels(maxNumChannels);
+	if (result < 0)
+	{
+		fprintf(stderr, "Unable to allocate mixing channels: %s\n", SDL_GetError());
+		active = false;
+		ret = true;
+	}
+
 	return ret;
 }
 
@@ -171,8 +179,56 @@ bool Audio::PlayFx(unsigned int id, int repeat)
 
 	if(id > 0 && id <= fx.Count())
 	{
+		// If (channel == -1) check all channels
+		// if (Mix_Playing(channel) == 0)
 		Mix_PlayChannel(-1, fx[id - 1], repeat);
 	}
 
 	return ret;
+}
+
+// Assign the distance and the direction to which the entity of the listener is located 
+// 0 = very close, 254 = far away, 255 = out of range (Volume = 0)
+void Audio::SetDistanceFx(int channel, int angle, uint distance, uint maxDistance)
+{
+	distance = distance * 255 / maxDistance;
+	if (distance > 255) distance = 255;
+	Mix_SetPosition(channel, angle, distance);
+}
+
+// Assign a different channel to each entity and when all available channels 
+// are assigned the function create 10 new ones
+int Audio::SetChannel()
+{
+	if (numChannels < maxNumChannels)
+	{
+		numChannels++;
+		return numChannels;
+	}
+	else
+	{
+		Mix_AllocateChannels(maxNumChannels + 10);
+		maxNumChannels += 10;
+		numChannels++;
+		return numChannels;
+	}
+
+	return -1;
+}
+
+// Extra functions
+
+bool Audio::PauseFx(int channel)
+{
+	Mix_Pause(channel);
+
+	return true;
+}
+
+// Resume WAV
+bool Audio::ResumeFx(int channel)
+{
+	Mix_Resume(channel);
+
+	return true;
 }

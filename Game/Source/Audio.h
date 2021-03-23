@@ -31,11 +31,18 @@ public:
 
 	// Play a previously loaded WAV
 	bool PlayFx(unsigned int fx, int repeat = 0);
+	void SetDistanceFx(int channel, int angle, uint distance, uint maxDistance);
+	bool PauseFx(int channel);
+	bool ResumeFx(int channel);
+	int SetChannel();
 
 private:
 
 	_Mix_Music* music;
 	List<Mix_Chunk *>	fx;
+
+	int maxNumChannels = 10;
+	int numChannels = 0;
 };
 
 #endif // __AUDIO_H__

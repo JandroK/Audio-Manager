@@ -33,7 +33,14 @@ public:
 	bool CleanUp();
 
 private:
-	SDL_Texture* img;
+
+	SDL_Texture* laserR;
+	SDL_Texture* laserB;
+
+	iPoint dimensionLaserR;
+	iPoint dimensionLaserB;
+
+	uint laserFx;
 };
 
 #endif // __SCENE_H__

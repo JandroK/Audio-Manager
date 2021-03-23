@@ -37,7 +37,8 @@ bool Audio::Awake(pugi::xml_node& config)
 	}
 	else
 	{
-		volumeMusic = config.child("music").attribute("volume").as_int(100);
+		volumeMusic = config.child("music").attribute("volume").as_int(MIX_MAX_VOLUME);
+		volumeFx = config.child("fx").attribute("volume").as_int(MIX_MAX_VOLUME);
 	}
 
 	// Load support for the JPG and PNG image formats
@@ -193,6 +194,8 @@ bool Audio::PlayFx(int channel, unsigned int id, int repeat)
 		if (Mix_Playing(channel) == 0)
 		{
 			//Mix_SetReverseStereo(channel, 1);
+			// If the channel volume is higher than the maximum volume, lower the volume  
+			if (Mix_Volume(channel, -1) > volumeFx) Mix_Volume(channel, volumeFx);
 			Mix_PlayChannel(channel, fx[id - 1], repeat);
 		}
 	}
@@ -230,9 +233,22 @@ int Audio::SetChannel()
 	return -1;
 }
 
+// DeleteChannel 
 void Audio::DeleteChannel()
 {
-	numChannels--;
+	pendingToDelete = true;
+	numChannelsToDelete++;
+}
+bool Audio::RemoveChannel()
+{
+	if (Mix_Playing(-1) == 0)
+	{
+		numChannels -= numChannelsToDelete;
+		numChannelsToDelete = 0;
+		pendingToDelete = false;
+	}
+
+	return false;
 }
 
 // Extra functions Music
@@ -263,13 +279,20 @@ void Audio::SetMusicVolume(int volume)
 	Mix_VolumeMusic(volume);
 }
 
-// Up/Down volume 
+// Up/Down Music volume 
 void Audio::ChangeMusicVolume(int volume)
 {
 	volumeMusic += volume;
 	if (volumeMusic > MIX_MAX_VOLUME) volumeMusic = MIX_MAX_VOLUME;
 	if (volumeMusic < 0) volumeMusic = 0;
 	Mix_VolumeMusic(volumeMusic);
+}
+// Up/Down Fx volume 
+void Audio::ChangeFxVolume(int volume)
+{
+	volumeFx += volume;
+	if (volumeFx > MIX_MAX_VOLUME) volumeFx = MIX_MAX_VOLUME;
+	if (volumeFx < 0) volumeFx = 0;
 }
 
 // Extra functions Fx
@@ -290,11 +313,13 @@ void Audio::StopFx(int channel)
 bool Audio::LoadState(pugi::xml_node& node)
 {
 	volumeMusic = node.child("music").attribute("volume").as_int(volumeMusic);
+	volumeFx = node.child("fx").attribute("volume").as_int(volumeFx);
 	Mix_VolumeMusic(volumeMusic);
 	return true;
 }
 bool Audio::SaveState(pugi::xml_node& node) const
 {
 	node.child("music").attribute("volume").set_value(volumeMusic);
+	node.child("fx").attribute("volume").set_value(volumeFx);
 	return true;
 }

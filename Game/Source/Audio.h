@@ -40,10 +40,12 @@ public:
 	void SetDistanceFx(int channel, int angle, uint distance, uint maxDistance);
 	int SetChannel();
 	void DeleteChannel();
+	bool RemoveChannel();
 	void PauseFx(int channel);
 	void ResumeFx(int channel);
 	void StopFx(int channel);
 	void ChangeMusicVolume(int volume);
+	void ChangeFxVolume(int volume);
 
 	// Save and Load volume
 	bool LoadState(pugi::xml_node& node);
@@ -51,6 +53,7 @@ public:
 
 	// Return volume music
 	int GetVolumeMusic() { return volumeMusic; }
+	bool GetPendingToDelete() { return pendingToDelete; }
 
 private:
 
@@ -60,7 +63,10 @@ private:
 	// TODO: Create the varaibles you need
 	int maxNumChannels = 10;
 	int numChannels = 0;
-	int volumeMusic = 100;
+	int numChannelsToDelete = 0;
+	int volumeMusic = 128; // 128 = MIX_MAX_VOLUME
+	int volumeFx = 128;
+	bool pendingToDelete = false;
 };
 
 #endif // __AUDIO_H__

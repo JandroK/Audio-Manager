@@ -15,6 +15,7 @@
     <fullscreen_window value="false"/>
   </window>
   <audio>
-    <music volume="100" />
+    <music volume="128" />
+    <fx volume="128" />
   </audio>
 </config>

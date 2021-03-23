@@ -113,9 +113,9 @@ bool Scene::Update(float dt)
 
 	// Up/Down Music
 	if (app->input->GetKey(SDL_SCANCODE_KP_PLUS) == KEY_DOWN)
-		app->audio->ChangeMusicVolume(10);
+		app->audio->ChangeFxVolume(10);
 	if (app->input->GetKey(SDL_SCANCODE_KP_MINUS) == KEY_DOWN)
-		app->audio->ChangeMusicVolume(-10);
+		app->audio->ChangeFxVolume(-10);
 
 	// Play Music
 	if (app->input->GetKey(SDL_SCANCODE_Z) == KEY_DOWN)
@@ -125,6 +125,17 @@ bool Scene::Update(float dt)
 	if (app->input->GetKey(SDL_SCANCODE_X) == KEY_DOWN)
 	{
 		app->audio->PlayMusic("Assets/Audio/Music/imperial_march.ogg");
+	}
+
+	if (app->audio->GetPendingToDelete() == true)
+	{
+		if (app->audio->RemoveChannel())
+		{
+			for (ListItem<Bullet*>* item2 = item->next; item2 != NULL; item2 = item2->next)
+			{
+				item2->data->channel = item2->prev->data->channel;
+			}
+		}
 	}
 	
 	return true;
@@ -192,12 +203,8 @@ void Scene::DeleteBody(Bullet* body)
 	{
 		if (item->data == body)
 		{
-			for (ListItem<Bullet*>* item2 = item->next; item2 != NULL; item2 = item2->next)
-			{
-				item2->data->channel = item2->prev->data->channel;
-			}
-			bullets.Del(item);
 			app->audio->DeleteChannel();
+			bullets.Del(item);
 
 			break;
 		}

@@ -181,7 +181,7 @@ bool Audio::PlayFx(int channel, unsigned int id, int repeat)
 	{
 		// If (channel == -1) check all channels
 		if (Mix_Playing(channel) == 0)
-			Mix_PlayChannel(-1, fx[id - 1], repeat);
+			Mix_PlayChannel(channel, fx[id - 1], repeat);
 	}
 
 	return ret;
@@ -200,15 +200,15 @@ void Audio::SetDistanceFx(int channel, int angle, uint distance, uint maxDistanc
 // are assigned the function create 10 new ones
 int Audio::SetChannel()
 {
-	if (numChannels < maxNumChannels)
+	if (numChannels < maxNumChannels - 1)
 	{
 		numChannels++;
 		return numChannels;
 	}
 	else
 	{
-		Mix_AllocateChannels(maxNumChannels + 10);
 		maxNumChannels += 10;
+		Mix_AllocateChannels(maxNumChannels);
 		numChannels++;
 		return numChannels;
 	}

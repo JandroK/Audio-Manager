@@ -9,6 +9,8 @@
 #include "Defs.h"
 #include "Log.h"
 
+#define MARGIN 50
+
 Scene::Scene() : Module()
 {
 	name.Create("scene");
@@ -39,6 +41,8 @@ bool Scene::Start()
 	SDL_QueryTexture(laserR, NULL, NULL, &dimensionLaserR.x, &dimensionLaserR.y);
 	SDL_QueryTexture(laserB, NULL, NULL, &dimensionLaserB.x, &dimensionLaserB.y);
 
+	player.x = (WINDOW_WIDTH * 0.5) - (dimensionLaserR.x * 0.5);
+	player.y = (WINDOW_HIGHT * 0.5) - (dimensionLaserR.y * 0.5);
 	//app->audio->PlayMusic("Assets/Audio/Music/music_spy.ogg");
 
 	return true;
@@ -47,6 +51,12 @@ bool Scene::Start()
 // Called each loop iteration
 bool Scene::PreUpdate()
 {
+	ListItem<Bullet*>* item;
+	for (item = bullets.start; item != NULL; item = item->next)
+	{
+		if(item->data->pendingToDelete == true) 
+			DeleteBody(item->data);
+	}
 	return true;
 }
 
@@ -65,14 +75,17 @@ bool Scene::Update(float dt)
 		}
 	}
 	// Explosion bullets all direction
-	if (app->input->GetKey(SDL_SCANCODE_SPACE) == KEY_REPEAT)
+	if (app->input->GetKey(SDL_SCANCODE_A) == KEY_DOWN)
 	{
-		AddBullet();
-
-		// Play Fx
-		for (item = bullets.start; item != NULL; item = item->next)
+		for (int i = 0; i < 360 / offsetAngle; i++)
 		{
-			app->audio->PlayFx(item->data->channel, laserFx);
+			AddBullet();
+
+			// Play Fx
+			for (item = bullets.start; item != NULL; item = item->next)
+			{
+				app->audio->PlayFx(item->data->channel, laserFx);
+			}
 		}
 	}
 
@@ -83,10 +96,20 @@ bool Scene::Update(float dt)
 		item->data->pos.y += speed * sin(item->data->angle * PI/180);
 	}
 
-	// Update distance and  direction
+	// Update distance and direction
 	for (item = bullets.start; item != NULL; item = item->next)
 	{
-		app->audio->SetDistanceFx(item->data->channel, item->data->angle, 0, 255);
+		app->audio->SetDistanceFx(item->data->channel, item->data->angle, DistanceToListener(player, item->data->pos), WINDOW_WIDTH/2);
+	}
+
+	// Check if the bullet is off-camera
+	for (item = bullets.start; item != NULL; item = item->next)
+	{
+		if (item->data->pos.x > WINDOW_WIDTH + MARGIN || item->data->pos.x < 0 - MARGIN
+			|| item->data->pos.y > WINDOW_HIGHT + MARGIN || item->data->pos.y < 0 - MARGIN)
+		{
+			item->data->pendingToDelete = true;
+		}
 	}
 	
 	return true;
@@ -118,26 +141,45 @@ void Scene::AddBullet()
 
 	// Assign texture
 	if (bullets.Count() % 2 == 0)
-	{
 		b->laserTex = laserR;
-		b->pos.x = (WINDOW_WIDTH * 0.5) - (dimensionLaserR.x * 0.5);
-		b->pos.y = (WINDOW_HIGHT * 0.5) - (dimensionLaserR.y * 0.5);
-	}
 	else
-	{
 		b->laserTex = laserB;
-		b->pos.x = (WINDOW_WIDTH * 0.5) - (dimensionLaserB.x * 0.5);
-		b->pos.y = (WINDOW_HIGHT * 0.5) - (dimensionLaserB.y * 0.5);
-	}
+
+	//Assign position
+	b->pos.x = player.x;
+	b->pos.y = player.y;
 
 	// Assign direction
 	if (bullets.Count() == 1)
 		b->angle = 0;
 	else
-		b->angle = bullets.end->prev->data->angle + 10;
+		b->angle = bullets.end->prev->data->angle + offsetAngle;
 
 	// Assign new channel
 	b->channel = app->audio->SetChannel();
+}
+
+int Scene::DistanceToListener(iPoint player, fPoint channel)
+{
+	iPoint pos;
+	pos.x = player.x - channel.x;
+	pos.y = player.y - channel.y;
+
+	return sqrt(pow(pos.x,2)+pow(pos.y,2));
+}
+
+// Delete one bullet
+void Scene::DeleteBody(Bullet* body)
+{
+	ListItem<Bullet*>* item;
+
+	for (item = bullets.start; item != NULL; item = item->next)
+	{
+		if (item->data == body)
+		{
+			bullets.Del(item);
+		}
+	}
 }
 
 // Called before quitting

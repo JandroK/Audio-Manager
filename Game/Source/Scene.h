@@ -12,6 +12,7 @@ public:
 	SDL_Texture* laserTex;
 	int angle;
 	int channel;
+	bool pendingToDelete = false;
 };
 
 class Scene : public Module
@@ -36,6 +37,7 @@ public:
 	bool Update(float dt);
 
 	void AddBullet();
+	int DistanceToListener(iPoint player, fPoint channel);
 
 	// Called before all Updates
 	bool PostUpdate();
@@ -43,14 +45,19 @@ public:
 	// Called before quitting
 	bool CleanUp();
 
+	// Delete entity
+	void DeleteBody(Bullet* body);
+
 private:
 	float speed = 0.1f;
+	int offsetAngle = 10;
 
 	SDL_Texture* laserR;
 	SDL_Texture* laserB;
 
 	iPoint dimensionLaserR;
 	iPoint dimensionLaserB;
+	iPoint player;
 
 	uint laserFx;
 

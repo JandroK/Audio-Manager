@@ -35,6 +35,10 @@ bool Audio::Awake(pugi::xml_node& config)
 		active = false;
 		ret = true;
 	}
+	else
+	{
+		volumeMusic = config.child("music").attribute("volume").as_int(100);
+	}
 
 	// Load support for the JPG and PNG image formats
 	int flags = MIX_INIT_OGG;
@@ -48,6 +52,7 @@ bool Audio::Awake(pugi::xml_node& config)
 	}
 
 	// Initialize SDL_mixer
+	// TODO: Activate stereo mode
 	if(Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
 	{
 		LOG("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
@@ -55,6 +60,7 @@ bool Audio::Awake(pugi::xml_node& config)
 		ret = true;
 	}
 
+	// TODO: Create as many channels as you need 
 	int result = Mix_AllocateChannels(maxNumChannels);
 	if (result < 0)
 	{
@@ -85,6 +91,9 @@ bool Audio::CleanUp()
 
 	fx.Clear();
 
+	// TODO: Free all channels
+	Mix_AllocateChannels(0);
+
 	Mix_CloseAudio();
 	Mix_Quit();
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
@@ -110,8 +119,8 @@ bool Audio::PlayMusic(const char* path, float fadeTime)
 		{
 			Mix_HaltMusic();
 		}
-
-		// this call blocks until fade out is done
+		
+		// This call blocks until fade out is done
 		Mix_FreeMusic(music);
 	}
 
@@ -180,8 +189,12 @@ bool Audio::PlayFx(int channel, unsigned int id, int repeat)
 	if(id > 0 && id <= fx.Count())
 	{
 		// If (channel == -1) check all channels
+		// TODO: Check if the channel is playing
 		if (Mix_Playing(channel) == 0)
+		{
+			//Mix_SetReverseStereo(channel, 1);
 			Mix_PlayChannel(channel, fx[id - 1], repeat);
+		}
 	}
 
 	return ret;
@@ -200,6 +213,7 @@ void Audio::SetDistanceFx(int channel, int angle, uint distance, uint maxDistanc
 // are assigned the function create 10 new ones
 int Audio::SetChannel()
 {
+	//TODO: Assign a different channel to each entity
 	if (numChannels < maxNumChannels - 1)
 	{
 		numChannels++;
@@ -216,19 +230,71 @@ int Audio::SetChannel()
 	return -1;
 }
 
-// Extra functions
-
-bool Audio::PauseFx(int channel)
+void Audio::DeleteChannel()
 {
-	Mix_Pause(channel);
-
-	return true;
+	numChannels--;
 }
 
-// Resume WAV
-bool Audio::ResumeFx(int channel)
+// Extra functions Music
+void Audio::PauseMusic()
+{
+	Mix_PauseMusic();
+}
+void Audio::ResumeMusic()
+{
+	Mix_ResumeMusic();
+}
+void Audio::StopMusic()
+{
+	Mix_HaltMusic();
+}
+void Audio::RewindMusic()
+{
+	Mix_RewindMusic();
+}
+// Set the position of the currently playing music
+void Audio::MusicPos(double second)
+{
+	Mix_SetMusicPosition(second);
+}
+// Set the volume to volume
+void Audio::SetMusicVolume(int volume)
+{
+	Mix_VolumeMusic(volume);
+}
+
+// Up/Down volume 
+void Audio::ChangeMusicVolume(int volume)
+{
+	volumeMusic += volume;
+	if (volumeMusic > MIX_MAX_VOLUME) volumeMusic = MIX_MAX_VOLUME;
+	if (volumeMusic < 0) volumeMusic = 0;
+	Mix_VolumeMusic(volumeMusic);
+}
+
+// Extra functions Fx
+void Audio::PauseFx(int channel)
+{
+	Mix_Pause(channel);
+}
+void Audio::ResumeFx(int channel)
 {
 	Mix_Resume(channel);
+}
+void Audio::StopFx(int channel)
+{
+	Mix_HaltChannel(channel);
+}
 
+// Load/Save
+bool Audio::LoadState(pugi::xml_node& node)
+{
+	volumeMusic = node.child("music").attribute("volume").as_int(volumeMusic);
+	Mix_VolumeMusic(volumeMusic);
+	return true;
+}
+bool Audio::SaveState(pugi::xml_node& node) const
+{
+	node.child("music").attribute("volume").set_value(volumeMusic);
 	return true;
 }

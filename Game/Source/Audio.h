@@ -25,6 +25,12 @@ public:
 
 	// Play a music file
 	bool PlayMusic(const char* path, float fadeTime = DEFAULT_MUSIC_FADE_TIME);
+	void PauseMusic();
+	void ResumeMusic();
+	void StopMusic();
+	void RewindMusic();
+	void MusicPos(double second);
+	void SetMusicVolume(int volume);
 
 	// Load a WAV in memory
 	unsigned int LoadFx(const char* path);
@@ -32,17 +38,29 @@ public:
 	// Play a previously loaded WAV
 	bool PlayFx(int channel, unsigned int fx, int repeat = 0);
 	void SetDistanceFx(int channel, int angle, uint distance, uint maxDistance);
-	bool PauseFx(int channel);
-	bool ResumeFx(int channel);
 	int SetChannel();
+	void DeleteChannel();
+	void PauseFx(int channel);
+	void ResumeFx(int channel);
+	void StopFx(int channel);
+	void ChangeMusicVolume(int volume);
+
+	// Save and Load volume
+	bool LoadState(pugi::xml_node& node);
+	bool SaveState(pugi::xml_node& node)const;
+
+	// Return volume music
+	int GetVolumeMusic() { return volumeMusic; }
 
 private:
 
 	_Mix_Music* music;
 	List<Mix_Chunk *>	fx;
 
+	// TODO: Create the varaibles you need
 	int maxNumChannels = 10;
 	int numChannels = 0;
+	int volumeMusic = 100;
 };
 
 #endif // __AUDIO_H__

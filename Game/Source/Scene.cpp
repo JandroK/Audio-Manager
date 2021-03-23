@@ -127,13 +127,15 @@ bool Scene::Update(float dt)
 		app->audio->PlayMusic("Assets/Audio/Music/imperial_march.ogg");
 	}
 
+	// If an entity has been released a channel too
 	if (app->audio->GetPendingToDelete() == true)
 	{
+		// If no channel is playing reassign the channels 
 		if (app->audio->RemoveChannel())
 		{
-			for (ListItem<Bullet*>* item2 = item->next; item2 != NULL; item2 = item2->next)
+			for (item = bullets.start; item != NULL; item = item->next)
 			{
-				item2->data->channel = item2->prev->data->channel;
+				item->data->channel = app->audio->SetChannel();
 			}
 		}
 	}

@@ -237,15 +237,17 @@ int Audio::SetChannel()
 void Audio::DeleteChannel()
 {
 	pendingToDelete = true;
-	numChannelsToDelete++;
 }
 bool Audio::RemoveChannel()
 {
 	if (Mix_Playing(-1) == 0)
 	{
-		numChannels -= numChannelsToDelete;
-		numChannelsToDelete = 0;
+		numChannels = 0;
+		maxNumChannels = 10;
+		Mix_AllocateChannels(maxNumChannels);
 		pendingToDelete = false;
+
+		return true;
 	}
 
 	return false;

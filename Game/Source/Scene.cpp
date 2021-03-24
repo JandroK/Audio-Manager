@@ -65,6 +65,7 @@ bool Scene::PreUpdate()
 bool Scene::Update(float dt)
 {
 	ListItem<Bullet*>* item;
+	// Create one bullet
 	if (app->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
 	{
 		AddBullet();
@@ -87,6 +88,20 @@ bool Scene::Update(float dt)
 			{
 				app->audio->PlayFx(item->data->channel, laserFx);
 			}
+		}
+	}
+	// Cerate one bullet in the direction of the mouse 
+	if (app->input->GetMouseButtonDown(SDL_BUTTON_LEFT)==KEY_DOWN)
+	{
+		iPoint posMouse;
+		app->input->GetMousePosition(posMouse.x, posMouse.y);
+		float angle = atan2(player.y - posMouse.y, player.x - posMouse.x) * 180 / PI;
+		AddBullet(angle + 180);
+
+		// Play Fx
+		for (item = bullets.start; item != NULL; item = item->next)
+		{
+			app->audio->PlayFx(item->data->channel, laserFx);
 		}
 	}
 
@@ -167,7 +182,7 @@ bool Scene::PostUpdate()
 	return ret;
 }
 
-void Scene::AddBullet()
+void Scene::AddBullet(float angle)
 {
 	// Create new entity
 	Bullet* b = new Bullet;
@@ -179,15 +194,20 @@ void Scene::AddBullet()
 	else
 		b->laserTex = laserB;
 
-	//Assign position
+	// Assign position
 	b->pos.x = player.x;
 	b->pos.y = player.y;
 
 	// Assign direction
-	if (bullets.Count() == 1)
-		b->angle = 0;
-	else
-		b->angle = bullets.end->prev->data->angle + offsetAngle;
+	if (angle == -1)
+	{
+		if (bullets.Count() == 1)
+			b->angle = 0;
+		else
+			b->angle = bullets.end->prev->data->angle + offsetAngle;
+	}
+	else 
+		b->angle = angle;
 
 	// Assign new channel
 	b->channel = app->audio->SetChannel();

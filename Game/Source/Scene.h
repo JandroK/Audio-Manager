@@ -36,7 +36,7 @@ public:
 	// Called each loop iteration
 	bool Update(float dt);
 
-	void AddBullet();
+	void AddBullet(float angle = -1);
 	int DistanceToListener(iPoint player, fPoint channel);
 
 	// Called before all Updates

@@ -13,3 +13,31 @@ The main focus of this research is:
 * Discard entities that are too far
 * Check camera position/zoom to play the audio spatially
 * Music Manager: Chain a playlist with fading
+
+## Music Manager
+
+The music manager is a module or code structure selfmade that allow the developer to handle different audio inputs from several sources, load and erasing those fx’s or audio at will. In this research we will be using audio.h and audio.cpp. In orther to follow the explanation it’s recommended to take a look to the [SDL_Mixer](https://www.libsdl.org/projects/SDL_mixer/docs/SDL_mixer.pdf) documentation.
+
+## Spatial audio
+
+Spatial Audio is any audio which gives you a sense of space beyond conventional stereo, allowing the user to pinpoint where sound is coming from, whether this is above, below, or a full 360 degrees around you. For example stereo allows you to hear things in front left and right, but you can’t get a sense of surround, height or sounds from below you. With the introduction of the 3rd dimension, you have a sense of the exact location of sound sources from all around. This definition also appeals to 3D audio.
+
+Let's see the differences with the other types of audio:
+
+The stereo audio have 2 channels:
+
+![](https://github.com/JandroK/Audio-Manager/blob/master/docs/Images/dolby_atmos_stereo.png)
+
+The surround sound have 5-7 channels:
+
+![](https://github.com/JandroK/Audio-Manager/blob/master/docs/Images/surround_sound.png)
+
+The spatial sound full 360 degrees around you:
+
+![](https://github.com/JandroK/Audio-Manager/blob/master/docs/Images/spatial_sound.png)
+
+
+
+https://www.youtube.com/watch?v=QFaSIti5_d0
+https://www.youtube.com/watch?v=xLxjRnpxhB0
+https://www.youtube.com/watch?v=cKx4UOyCDpo

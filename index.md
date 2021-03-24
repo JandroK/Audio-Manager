@@ -36,8 +36,12 @@ The spatial sound full 360 degrees around you:
 
 ![](https://github.com/JandroK/Audio-Manager/blob/master/docs/Images/spatial_sound.png)
 
+Spatial audio is a manipulation of the sound that makes the feeling of a 3D space, you can listen [here](https://upfa3d.wordpress.com/category/spatial-audio/) videos that show this effect.
 
+You can also check the audio difference in the following videos:
 
-https://www.youtube.com/watch?v=QFaSIti5_d0
-https://www.youtube.com/watch?v=xLxjRnpxhB0
-https://www.youtube.com/watch?v=cKx4UOyCDpo
+[LST | 3D Sound Demo](https://www.youtube.com/watch?v=QFaSIti5_d0)
+
+[Call of Duty Warzone Sound: Stereo vs. Dolby Atmos vs. Windows Sonic](https://www.youtube.com/watch?v=xLxjRnpxhB0)
+
+[Resident Evil 2 Remake: Windows Sonic vs Dolby Atmos vs DTS Headphone:X [HRTF]](https://www.youtube.com/watch?v=cKx4UOyCDpo)

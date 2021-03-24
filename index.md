@@ -40,8 +40,8 @@ Spatial audio is a manipulation of the sound that makes the feeling of a 3D spac
 
 You can also check the audio difference in the following videos:
 
-[LST | 3D Sound Demo](https://www.youtube.com/watch?v=QFaSIti5_d0)
+* [LST | 3D Sound Demo](https://www.youtube.com/watch?v=QFaSIti5_d0)
 
-[Call of Duty Warzone Sound: Stereo vs. Dolby Atmos vs. Windows Sonic](https://www.youtube.com/watch?v=xLxjRnpxhB0)
+* [Call of Duty Warzone Sound: Stereo vs. Dolby Atmos vs. Windows Sonic](https://www.youtube.com/watch?v=xLxjRnpxhB0)
 
-[Resident Evil 2 Remake: Windows Sonic vs Dolby Atmos vs DTS Headphone:X [HRTF]](https://www.youtube.com/watch?v=cKx4UOyCDpo)
+* [Resident Evil 2 Remake: Windows Sonic vs Dolby Atmos vs DTS Headphone:X [HRTF]](https://www.youtube.com/watch?v=cKx4UOyCDpo)

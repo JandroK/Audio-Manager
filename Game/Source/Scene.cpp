@@ -98,9 +98,10 @@ bool Scene::Update(float dt)
 	}
 
 	// Update distance and direction
+	// 0 = directly in front / 90 = directly to the right / 180 = directly behind / 270 = directly to the left.
 	for (item = bullets.start; item != NULL; item = item->next)
 	{
-		app->audio->SetDistanceFx(item->data->channel, item->data->angle, DistanceToListener(player, item->data->pos), WINDOW_WIDTH/2);
+		app->audio->SetDistanceFx(item->data->channel, item->data->angle + 90, DistanceToListener(player, item->data->pos), WINDOW_WIDTH/2);
 	}
 
 	// Check if the bullet is off-camera

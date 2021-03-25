@@ -46,3 +46,31 @@ You can also check the audio difference in the following videos:
 
 * [Resident Evil 2 Remake: Windows Sonic vs Dolby Atmos vs DTS Headphone:X [HRTF]](https://www.youtube.com/watch?v=cKx4UOyCDpo)
 
+## Core concepts & functions
+
+The audio manager developed in this research is based on the following SDL_MIXER functions extracted from section 4 of the function [documentation](https://www.libsdl.org/projects/SDL_mixer/docs/SDL_mixer_6.html).
+
+#### Channels
+
+* **Mix_AllocateChannels:** Set the number of channels being mixed. This can be called multiple times, even with sounds playing. If numchans is less than the current number of channels, then the higher channels will be stopped, freed, and therefore not mixed any longer. If passing in zero will free all mixing channels, however music will still play.
+   * **Function:** int Mix_AllocateChannels(int numchans)
+      * int numchans: Number of channels to allocate for mixing. A negative number will not do anything, it will tell you how many channels are currently allocated.
+   * **Returns:** The number of channels allocated.
+
+* **Mix_Volume:** Set the volume for any allocated channel. If channel is -1 then all channels at are set at once. The volume is applied during the final mix, along with the sample volume. So setting this volume to 64 will halve the output of all samples played on the specified channel. All channels default to a volume of 128, which is the max. Newly allocated channels will have the max volume set, so setting all channels volumes does not affect subsequent channel allocations.
+   * **Function:** int Mix_Volume(int channel, int volume)
+      * int channel: Channel to set mix volume for. -1 will set the volume for all allocated channels.
+      * int volume: The volume to use from 0 to MIX_MAX_VOLUME(128). If less than 0 then the volume will not be set.
+   * **Return:** Current volume of the channel. If channel is -1, the average volume is returned.
+
+
+
+
+
+
+
+
+
+
+
+

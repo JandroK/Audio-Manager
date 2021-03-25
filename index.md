@@ -206,59 +206,61 @@ In this section we will explain the functions related to "spatial audio" and cha
 
 * **PlayMusic:** This function takes care of the transition between songs using  a fade of out and in with the SDL functions "Mix_FadeOutMusic" and "Mix_FadeInMusic". First it checks if there is any song running, if so, the music fades the time in ms that we have indicated as an input parameter to the function, then it frees the song from memory and loads the new one by playing it with a fade in. 
    * **Function:** *bool **PlayMusic**(const char* path, float fadeTime = DEFAULT_MUSIC_FADE_TIME)* 
+   
    ```c
+   
    // Play a music file
    bool Audio::PlayMusic(const char* path, float fadeTime)
    {
-	bool ret = true;
-
-	if(!active)
-		return false;
-
-	if(music != NULL)
-	{
-		if(fadeTime > 0.0f)
-		{
-			Mix_FadeOutMusic(int(fadeTime * 1000.0f));
-		}
-		else
-		{
-			Mix_HaltMusic();
-		}
-		
-		// This call blocks until fade out is done
-		Mix_FreeMusic(music);
-	}
-
-	music = Mix_LoadMUS(path);
-
-	if(music == NULL)
-	{
-		LOG("Cannot load music %s. Mix_GetError(): %s\n", path, Mix_GetError());
-		ret = false;
-	}
-	else
-	{
-		if(fadeTime > 0.0f)
-		{
-			if(Mix_FadeInMusic(music, -1, (int) (fadeTime * 1000.0f)) < 0)
-			{
-				LOG("Cannot fade in music %s. Mix_GetError(): %s", path, Mix_GetError());
-				ret = false;
-			}
-		}
-		else
-		{
-			if(Mix_PlayMusic(music, -1) < 0)
-			{
-				LOG("Cannot play in music %s. Mix_GetError(): %s", path, Mix_GetError());
-				ret = false;
-			}
-		}
-	}
-
-	LOG("Successfully playing %s", path);
-	return ret;
+   	bool ret = true;
+   
+   	if(!active)
+   		return false;
+   
+   	if(music != NULL)
+   	{
+   		if(fadeTime > 0.0f)
+   		{
+   			Mix_FadeOutMusic(int(fadeTime * 1000.0f));
+   		}
+   		else
+   		{
+   			Mix_HaltMusic();
+   		}
+   		
+   		// This call blocks until fade out is done
+   		Mix_FreeMusic(music);
+   	}
+   
+   	music = Mix_LoadMUS(path);
+   
+   	if(music == NULL)
+   	{
+   		LOG("Cannot load music %s. Mix_GetError(): %s\n", path, Mix_GetError());
+   		ret = false;
+   	}
+   	else
+   	{
+   		if(fadeTime > 0.0f)
+   		{
+   			if(Mix_FadeInMusic(music, -1, (int) (fadeTime * 1000.0f)) < 0)
+   			{
+   				LOG("Cannot fade in music %s. Mix_GetError(): %s", path, Mix_GetError());
+   				ret = false;
+   			}
+   		}
+   		else
+   		{
+   			if(Mix_PlayMusic(music, -1) < 0)
+   			{
+   				LOG("Cannot play in music %s. Mix_GetError(): %s", path, Mix_GetError());
+   				ret = false;
+   			}
+   		}
+   	}
+   
+   	LOG("Successfully playing %s", path);
+   	return ret;
    }
    ```
 

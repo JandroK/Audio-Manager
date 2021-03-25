@@ -211,6 +211,7 @@ In this section we will explain the functions related to "spatial audio" and cha
       * const char* path: It is the relative path of the file.
       * float fadeTime: Is the time in seconds that the fade will last
       * DEFAULT_MUSIC_FADE_TIME: 2.0f
+
    ```c
    
    // Play a music file

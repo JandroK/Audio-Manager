@@ -149,6 +149,7 @@ The fade in effect only applies to the first loop. Any previous music will be ha
 The audio manager uses all the following functions: 
 
 ```c
+
 // Constructor
 Audio();
 
@@ -206,7 +207,10 @@ In this section we will explain the functions related to "spatial audio" and cha
 
 * **PlayMusic:** This function takes care of the transition between songs using  a fade of out and in with the SDL functions "Mix_FadeOutMusic" and "Mix_FadeInMusic". First it checks if there is any song running, if so, the music fades the time in ms that we have indicated as an input parameter to the function, then it frees the song from memory and loads the new one by playing it with a fade in. 
    * **Function:** *bool **PlayMusic**(const char* path, float fadeTime = DEFAULT_MUSIC_FADE_TIME)* 
-   
+   * **Input parameters:** 
+      * const char* path: It is the relative path of the file.
+      * float fadeTime: Is the time in seconds that the fade will last
+      * DEFAULT_MUSIC_FADE_TIME: 2.0f
    ```c
    
    // Play a music file
@@ -264,6 +268,42 @@ In this section we will explain the functions related to "spatial audio" and cha
    }
    ```
 
+* **PlayFx:** This function takes care of playing a sound effect. First check if the sound effect is in the sound list of the audio manager, if so, check if that sound is already playing so that the audio doesn't collapse. Then check if the sound to be played has a prefixed volume and assigns this volume. After, lower the volume if the channel volume is higher than the maximum volume so that all sounds sound at maximum at that intensity. Finally the effect is reproduced as many times as has been indicated.
+   * **Function:** *bool **PlayFx**(int channel, unsigned int fx, int repeat = 0, int volume = -1)*
+   * **Input parameters:** 
+      * int channel: Channel to play on, or -1 for the first free unreserved channel
+      * unsigned int fx: The id of the sound list
+      * int repeat: Number of loops, -1 is infinite loops, passing one here plays the sample twice (1 loop)
+      * int volume: Music volume, from 0 to MIX_MAX_VOLUME(128)
+
+   ```c
+   
+   // Play WAV
+   bool Audio::PlayFx(int channel, unsigned int id, int repeat, int volume)
+   {
+   	bool ret = false;
+   
+   	if(!active)
+   		return false;
+   
+   	if(id > 0 && id <= fx.Count())
+   	{
+   		// If Mix_Playing(-1) check all channels
+   		// TODO 3: Check if the channel isn't playing
+   		if (Mix_Playing(channel) == 0)
+   		{
+   			// TODO 4: Check if volume is hardcoded and 
+   			// lower the volume if the channel volume is higher than the maximum volume  
+   			if (volume != -1) Mix_Volume(channel, volume);
+   			if (Mix_Volume(channel, -1) > volumeFx) 
+   				Mix_Volume(channel, volumeFx);
+   			Mix_PlayChannel(channel, fx[id - 1], repeat);
+   		}
+   	}
+   
+   	return ret;
+   }
+   ```
 
 
 

@@ -53,9 +53,9 @@ The audio manager developed in this research is based on the following SDL_MIXER
 #### Channels
 
 * **Mix_AllocateChannels:** Set the number of channels being mixed. This can be called multiple times, even with sounds playing. If numchans is less than the current number of channels, then the higher channels will be stopped, freed, and therefore not mixed any longer. If passing in zero will free all mixing channels, however music will still play.
-   * **Function:** int Mix_AllocateChannels(int numchans)
+   * **Function:** int *Mix_AllocateChannels*int numchans)
    ```c
-   Mix_AllocateChannels(numchans);
+   int result = Mix_AllocateChannels(numchans);
    if (result < 0)
    {
 		   fprintf(stderr, "Unable to allocate mixing channels: %s\n", SDL_GetError());
@@ -68,7 +68,7 @@ The audio manager developed in this research is based on the following SDL_MIXER
    * **Returns:** The number of channels allocated.
 
 * **Mix_Volume:** Set the volume for any allocated channel. If channel is -1 then all channels at are set at once. The volume is applied during the final mix, along with the sample volume. So setting this volume to 64 will halve the output of all samples played on the specified channel. All channels default to a volume of 128, which is the max. Newly allocated channels will have the max volume set, so setting all channels volumes does not affect subsequent channel allocations.
-   * **Function:** int Mix_Volume(int channel, int volume)
+   * **Function:** int *Mix_Volume*(int channel, int volume)
    ```c
    Mix_Volume(channel, volume)
    // int channel: Channel to set mix volume for. -1 will set the volume for all allocated channels.
@@ -76,8 +76,24 @@ The audio manager developed in this research is based on the following SDL_MIXER
    ```
    * **Return:** Current volume of the channel. If channel is -1, the average volume is returned.
 
+* **Mix_PlayChannel:** Play chunk on channel, or if channel is -1, pick the first free unreserved channel. The sample will play for loops+1 number of times, unless stopped by halt, or fade out, or setting a new expiration time of less time than it would have originally taken to play the loops, or closing the mixer.
+   * **Function:** int *Mix_PlayChannel*(int channel, Mix_Chunk *chunk, int loops)
+   ```c
+   Mix_PlayChannel(channel, fx[id - 1], repeat);
+   // int channel: Channel to play on, or -1 for the first free unreserved channel.
+   // Mix_Chunk * chunk: Sample to play
+   // int loops: Number of loops, -1 is infinite loops, passing one here plays the sample twice (1 loop).
+   ```
+   * **Return:** The channel the sample is played on. On any errors, -1 is returned.
 
-
+* **Mix_Playing:** Tells you if channel is playing, or not.
+   * **Function:** int *Mix_Playing*(int channel)
+   ```c
+   Mix_Playing(channel)
+   // int channel: Channel to test whether it is playing or not.
+   // -1 will tell you how many channels are playing.
+   ```
+   * **Return:** Zero if the channel is not playing. Otherwise if you passed in -1, the number of channels playing is returned. If you passed in a specific channel, then 1 is returned if it is playing.
 
 
 

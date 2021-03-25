@@ -144,6 +144,132 @@ The fade in effect only applies to the first loop. Any previous music will be ha
    ```
    * **Return:** Zero on errors, such as an invalid channel.
 
+## Audio Manger Functions
+
+The audio manager uses all the following functions: 
+
+```c
+// Constructor
+Audio();
+
+// Destructor
+virtual ~Audio();
+
+// Called before render is available
+bool Awake(pugi::xml_node&);
+
+// Called before quitting
+bool CleanUp();
+void UnloadFxs();
+void Unload1Fx(int index);
+
+// Play a music file
+bool PlayMusic(const char* path, float fadeTime = DEFAULT_MUSIC_FADE_TIME);
+void PauseMusic();
+void ResumeMusic();
+void StopMusic();
+void RewindMusic();
+
+void MusicPos(double second);
+void SetMusicVolume(int volume);
+
+// Load a WAV in memory
+unsigned int LoadFx(const char* path);
+
+// Play a previously loaded WAV
+bool PlayFx(int channel, unsigned int fx, int repeat = 0, int volume = -1);
+
+void SetDistanceFx(int channel, int angle, uint distance, uint maxDistance);
+int SetChannel();
+
+void DeleteChannel();
+bool RemoveChannel();
+
+void PauseFx(int channel);
+void ResumeFx(int channel);
+void StopFx(int channel);
+
+void ChangeMusicVolume(int volume);
+void ChangeFxVolume(int volume);
+
+// Save and Load volume
+bool LoadState(pugi::xml_node& node);
+bool SaveState(pugi::xml_node& node)const;
+
+// Return volume music
+int GetVolumeMusic() { return volumeMusic; }
+bool GetPendingToDelete() { return pendingToDelete; }
+```
+*Module Audio header file*
+
+In this section we will explain the functions related to "spatial audio" and channel assignment.
+
+* **PlayMusic:** This function takes care of the transition between songs using  a fade of out and in with the SDL functions "Mix_FadeOutMusic" and "Mix_FadeInMusic". First it checks if there is any song running, if so, the music fades the time in ms that we have indicated as an input parameter to the function, then it frees the song from memory and loads the new one by playing it with a fade in. 
+   * **Function:** *bool **PlayMusic**(const char* path, float fadeTime = DEFAULT_MUSIC_FADE_TIME)* 
+   ```c
+   // Play a music file
+   bool Audio::PlayMusic(const char* path, float fadeTime)
+   {
+	bool ret = true;
+
+	if(!active)
+		return false;
+
+	if(music != NULL)
+	{
+		if(fadeTime > 0.0f)
+		{
+			Mix_FadeOutMusic(int(fadeTime * 1000.0f));
+		}
+		else
+		{
+			Mix_HaltMusic();
+		}
+		
+		// This call blocks until fade out is done
+		Mix_FreeMusic(music);
+	}
+
+	music = Mix_LoadMUS(path);
+
+	if(music == NULL)
+	{
+		LOG("Cannot load music %s. Mix_GetError(): %s\n", path, Mix_GetError());
+		ret = false;
+	}
+	else
+	{
+		if(fadeTime > 0.0f)
+		{
+			if(Mix_FadeInMusic(music, -1, (int) (fadeTime * 1000.0f)) < 0)
+			{
+				LOG("Cannot fade in music %s. Mix_GetError(): %s", path, Mix_GetError());
+				ret = false;
+			}
+		}
+		else
+		{
+			if(Mix_PlayMusic(music, -1) < 0)
+			{
+				LOG("Cannot play in music %s. Mix_GetError(): %s", path, Mix_GetError());
+				ret = false;
+			}
+		}
+	}
+
+	LOG("Successfully playing %s", path);
+	return ret;
+   }
+   ```
+
+
+
+
+
+
+
+
+
 
 
 

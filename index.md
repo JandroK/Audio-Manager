@@ -306,13 +306,139 @@ In this section we will explain the functions related to "spatial audio" and cha
    }
    ```
 
+* **SetDistanceFx:** Assign the distance and direction to which the entity of the listener is located. Knowing the distance at which the entity is from the listener and the maximum distance at which we want the sound to stop being heard, we can make a rule of three to know the distance in units that the "Mix_SetPosition" function uses. Being 0 = very close, 254 = far away, 255 = out of range (Volume = 0).
+   * **Function:** *void **SetDistanceFx**(int channel, int angle, uint distance, uint maxDistance)*
+   * **Input parameters:** 
+      * int channel: Channel to play on, or -1 for the first free unreserved channel
+      * int angle: Direction in relation to forward from 0 to 360 degrees
+      * uint distance: The distance from the listener, from 0(near/loud) to 255(far/quiet)
+      * uint maxDistance: From what distance do you stop hearing the sound
+    
+   ```c
+   void Audio::SetDistanceFx(int channel, int angle, uint distance, uint maxDistance)
+   {
+   	distance = distance * 255 / maxDistance;
+   	if (distance > 255) distance = 255;
+   	Mix_SetPosition(channel, angle, distance);
+   }
+   ```
 
+* **SetChannel:** Assign a different channel to each entity and when all available channels are assigned the function create 10 new ones. The -1 is security system because without him the last channel doesn't play. 
+   * **Function:** *int **SetChannel**()*
 
+   ```c
+   
+   int Audio::SetChannel()
+   {
+   	if (numChannels < maxNumChannels - 1)
+   	{
+   		numChannels++;
+   		return numChannels;
+   	}
+   	else
+   	{
+   		maxNumChannels += 10;
+   		Mix_AllocateChannels(maxNumChannels);
+   		numChannels++;
+   		return numChannels;
+   	}
+   
+   	return -1;
+   }
+   ```
+   
+ * **RemoveChannel:** Restart channels as they were at the beginning. First release all channels with Mix_AllocateChannels(0) and after create a 10 new ones. This will only happen if no channel is playing because otherwise the sound would suddenly stop hearing and transmit bad feedback. To do this check we go through all the channels with the function Mix_Playing(-1). Clearly this function will only be called if there is a notice that a channel will no longer be used.
+   * **Function:** *bool **RemoveChannel**()*  
+   
+   ```c
+   
+   bool Audio::RemoveChannel()
+   {
+   	if (Mix_Playing(-1) == 0)
+   	{
+   		numChannels = 0;
+   		maxNumChannels = 10;
+   		Mix_AllocateChannels(0);
+   		Mix_AllocateChannels(maxNumChannels);
+   		pendingToDelete = false;
+   
+   		return true;
+   	}
+   
+   	return false;
+   }
+   ```
+   
+ * **DeleteChannel:** Takes care of changing the "pendingToDelete" variable to true. This variable tells the audio manager that it must call the "RemoveChannel" function to release channels.
+   * **Function:** *voidDeleteChannel**()*
+   
+   ```c
+   void Audio::DeleteChannel()
+   {
+   	pendingToDelete = true;
+   }
+   ```
+   
+## Extra Functions
 
+The following functions are small functions for the developer to have full control of the sound reproduction:
 
+```c
 
+void Audio::PauseMusic()
+{
+	Mix_PauseMusic();
+}
+void Audio::ResumeMusic()
+{
+	Mix_ResumeMusic();
+}
+void Audio::StopMusic()
+{
+	Mix_HaltMusic();
+}
+void Audio::RewindMusic()
+{
+	Mix_RewindMusic();
+}
+// Set the position of the currently playing music
+void Audio::MusicPos(double second)
+{
+	Mix_SetMusicPosition(second);
+}
+// Set the volume to volume
+void Audio::SetMusicVolume(int volume)
+{
+	Mix_VolumeMusic(volume);
+}
 
+// TODO 10: Up/Down Music volume 
+void Audio::ChangeMusicVolume(int volume)
+{
+	volumeMusic += volume;
+	if (volumeMusic > MIX_MAX_VOLUME) volumeMusic = MIX_MAX_VOLUME;
+	if (volumeMusic < 0) volumeMusic = 0;
+	Mix_VolumeMusic(volumeMusic);
+}
+// TODO 10: Up/Down Fx volume 
+void Audio::ChangeFxVolume(int volume)
+{
+	volumeFx += volume;
+	if (volumeFx > MIX_MAX_VOLUME) volumeFx = MIX_MAX_VOLUME;
+	if (volumeFx < 0) volumeFx = 0;
+}
 
-
-
-
+// Extra functions Fx
+void Audio::PauseFx(int channel)
+{
+	Mix_Pause(channel);
+}
+void Audio::ResumeFx(int channel)
+{
+	Mix_Resume(channel);
+}
+void Audio::StopFx(int channel)
+{
+	Mix_HaltChannel(channel);
+}
+```

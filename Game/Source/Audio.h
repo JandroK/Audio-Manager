@@ -22,6 +22,8 @@ public:
 
 	// Called before quitting
 	bool CleanUp();
+	void UnloadFxs();
+	void Unload1Fx(int index);
 
 	// Play a music file
 	bool PlayMusic(const char* path, float fadeTime = DEFAULT_MUSIC_FADE_TIME);
@@ -36,7 +38,7 @@ public:
 	unsigned int LoadFx(const char* path);
 
 	// Play a previously loaded WAV
-	bool PlayFx(int channel, unsigned int fx, int repeat = 0);
+	bool PlayFx(int channel, unsigned int fx, int repeat = 0, int volume = -1);
 	void SetDistanceFx(int channel, int angle, uint distance, uint maxDistance);
 	int SetChannel();
 	void DeleteChannel();

@@ -112,27 +112,21 @@ bool Scene::Update(float dt)
 		item->data->pos.y += speed * sin(item->data->angle * PI/180);
 	}
 
-	// Update distance and direction
+	// TODO 5: Update distance and direction
 	// 0 = directly in front / 90 = directly to the right / 180 = directly behind / 270 = directly to the left.
 	for (item = bullets.start; item != NULL; item = item->next)
 	{
 		app->audio->SetDistanceFx(item->data->channel, item->data->angle + 90, DistanceToListener(player, item->data->pos), WINDOW_WIDTH/2);
 	}
 
-	// Check if the bullet is off-camera
-	for (item = bullets.start; item != NULL; item = item->next)
-	{
-		if (item->data->pos.x > WINDOW_WIDTH + MARGIN || item->data->pos.x < 0 - MARGIN
-			|| item->data->pos.y > WINDOW_HIGHT + MARGIN || item->data->pos.y < 0 - MARGIN)
-		{
-			item->data->pendingToDelete = true;
-		}
-	}
-
-	// Up/Down Music
+	// TODO 10: Up/Down Music
 	if (app->input->GetKey(SDL_SCANCODE_KP_PLUS) == KEY_DOWN)
-		app->audio->ChangeFxVolume(10);
+		app->audio->ChangeMusicVolume(10);
 	if (app->input->GetKey(SDL_SCANCODE_KP_MINUS) == KEY_DOWN)
+		app->audio->ChangeMusicVolume(-10);
+	if (app->input->GetKey(SDL_SCANCODE_UP) == KEY_DOWN)
+		app->audio->ChangeFxVolume(10);
+	if (app->input->GetKey(SDL_SCANCODE_DOWN) == KEY_DOWN)
 		app->audio->ChangeFxVolume(-10);
 
 	// Play Music
@@ -145,10 +139,20 @@ bool Scene::Update(float dt)
 		app->audio->PlayMusic("Assets/Audio/Music/imperial_march.ogg");
 	}
 
+	// Check if the bullet is off-camera
+	for (item = bullets.start; item != NULL; item = item->next)
+	{
+		if (item->data->pos.x > WINDOW_WIDTH + MARGIN || item->data->pos.x < 0 - MARGIN
+			|| item->data->pos.y > WINDOW_HIGHT + MARGIN || item->data->pos.y < 0 - MARGIN)
+		{
+			item->data->pendingToDelete = true;
+		}
+	}
+
 	// If an entity has been released a channel too
 	if (app->audio->GetPendingToDelete() == true)
 	{
-		// If no channel is playing reassign the channels 
+		// TODO 8: If no channel is playing reassign the channels 
 		if (app->audio->RemoveChannel())
 		{
 			for (item = bullets.start; item != NULL; item = item->next)
@@ -209,7 +213,7 @@ void Scene::AddBullet(float angle)
 	else 
 		b->angle = angle;
 
-	// Assign new channel
+	// TODO 6: Assign new channel
 	b->channel = app->audio->SetChannel();
 }
 
@@ -231,9 +235,9 @@ void Scene::DeleteBody(Bullet* body)
 	{
 		if (item->data == body)
 		{
-			app->audio->DeleteChannel();
 			bullets.Del(item);
-
+			// TODO 9: Notify the audio manager that a channel can be released 
+			app->audio->DeleteChannel();
 			break;
 		}
 	}

@@ -53,7 +53,7 @@ bool Audio::Awake(pugi::xml_node& config)
 	}
 
 	// Initialize SDL_mixer
-	// TODO: Activate stereo mode
+	// TODO 1: Activate stereo mode
 	if(Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
 	{
 		LOG("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
@@ -61,7 +61,7 @@ bool Audio::Awake(pugi::xml_node& config)
 		ret = true;
 	}
 
-	// TODO: Create as many channels as you need 
+	// TODO 2: Create as many channels as you need 
 	int result = Mix_AllocateChannels(maxNumChannels);
 	if (result < 0)
 	{
@@ -86,13 +86,9 @@ bool Audio::CleanUp()
 		Mix_FreeMusic(music);
 	}
 
-	ListItem<Mix_Chunk*>* item;
-	for(item = fx.start; item != NULL; item = item->next)
-		Mix_FreeChunk(item->data);
+	UnloadFxs();
 
-	fx.Clear();
-
-	// TODO: Free all channels
+	// TODO 2: Free all channels
 	Mix_AllocateChannels(0);
 
 	Mix_CloseAudio();
@@ -100,6 +96,24 @@ bool Audio::CleanUp()
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 
 	return true;
+}
+// Unload all Fx
+void Audio::UnloadFxs()
+{
+	ListItem<Mix_Chunk*>* item;
+	for (item = fx.start; item != NULL; item = item->next)
+		Mix_FreeChunk(item->data);
+
+	fx.Clear();
+}
+// Unload 1 Fx
+void Audio::Unload1Fx(int index)
+{
+	if (fx[index] != nullptr)
+	{
+		Mix_FreeChunk(fx[index]);
+		fx[index] = nullptr;
+	}
 }
 
 // Play a music file
@@ -180,7 +194,7 @@ unsigned int Audio::LoadFx(const char* path)
 }
 
 // Play WAV
-bool Audio::PlayFx(int channel, unsigned int id, int repeat)
+bool Audio::PlayFx(int channel, unsigned int id, int repeat, int volume)
 {
 	bool ret = false;
 
@@ -190,12 +204,14 @@ bool Audio::PlayFx(int channel, unsigned int id, int repeat)
 	if(id > 0 && id <= fx.Count())
 	{
 		// If (channel == -1) check all channels
-		// TODO: Check if the channel is playing
+		// TODO 3: Check if the channel isn't playing
 		if (Mix_Playing(channel) == 0)
 		{
-			//Mix_SetReverseStereo(channel, 1);
-			// If the channel volume is higher than the maximum volume, lower the volume  
-			if (Mix_Volume(channel, -1) > volumeFx) Mix_Volume(channel, volumeFx);
+			// TODO 4: Check if volume is hardcoded and 
+			// lower the volume if the channel volume is higher than the maximum volume  
+			if (volume != -1) Mix_Volume(channel, volume);
+			if (Mix_Volume(channel, -1) > volumeFx) 
+				Mix_Volume(channel, volumeFx);
 			Mix_PlayChannel(channel, fx[id - 1], repeat);
 		}
 	}
@@ -203,7 +219,7 @@ bool Audio::PlayFx(int channel, unsigned int id, int repeat)
 	return ret;
 }
 
-// Assign the distance and direction to which the entity of the listener is located 
+// TODO 5: Assign the distance and direction to which the entity of the listener is located 
 // 0 = very close, 254 = far away, 255 = out of range (Volume = 0)
 void Audio::SetDistanceFx(int channel, int angle, uint distance, uint maxDistance)
 {
@@ -212,11 +228,10 @@ void Audio::SetDistanceFx(int channel, int angle, uint distance, uint maxDistanc
 	Mix_SetPosition(channel, angle, distance);
 }
 
-// Assign a different channel to each entity and when all available channels 
-// are assigned the function create 10 new ones
+// TODO 6: Assign a different channel to each entity and when all available channels 
+// are assigned the function must create 10 new ones
 int Audio::SetChannel()
 {
-	//TODO: Assign a different channel to each entity
 	if (numChannels < maxNumChannels - 1)
 	{
 		numChannels++;
@@ -233,12 +248,12 @@ int Audio::SetChannel()
 	return -1;
 }
 
-// DeleteChannel 
+// TODO 9: DeleteChannel 
 void Audio::DeleteChannel()
 {
 	pendingToDelete = true;
 }
-// Restart channels
+// TODO 8: Restart channels as they were at the beginning
 bool Audio::RemoveChannel()
 {
 	if (Mix_Playing(-1) == 0)
@@ -282,7 +297,7 @@ void Audio::SetMusicVolume(int volume)
 	Mix_VolumeMusic(volume);
 }
 
-// Up/Down Music volume 
+// TODO 10: Up/Down Music volume 
 void Audio::ChangeMusicVolume(int volume)
 {
 	volumeMusic += volume;
@@ -290,7 +305,7 @@ void Audio::ChangeMusicVolume(int volume)
 	if (volumeMusic < 0) volumeMusic = 0;
 	Mix_VolumeMusic(volumeMusic);
 }
-// Up/Down Fx volume 
+// TODO 10: Up/Down Fx volume 
 void Audio::ChangeFxVolume(int volume)
 {
 	volumeFx += volume;

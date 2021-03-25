@@ -53,7 +53,7 @@ The audio manager developed in this research is based on the following SDL_MIXER
 #### Channels
 
 * **Mix_AllocateChannels:** Set the number of channels being mixed. This can be called multiple times, even with sounds playing. If numchans is less than the current number of channels, then the higher channels will be stopped, freed, and therefore not mixed any longer. If passing in zero will free all mixing channels, however music will still play.
-   * **Function:** int *Mix_AllocateChannels*int numchans)
+   * **Function:** *int **Mix_AllocateChannels**(int numchans)*
    ```c
    int result = Mix_AllocateChannels(numchans);
    if (result < 0)
@@ -62,42 +62,71 @@ The audio manager developed in this research is based on the following SDL_MIXER
 		   active = false;
 		   ret = true;
    }
-   // int numchans: Number of channels to allocate for mixing. 
-   // A negative number will not do anything, it will tell you how many channels are currently allocated.
+   // int numchans: Number of channels to allocate for mixing 
+   // A negative number will not do anything, it will tell you how many channels are currently allocated
    ```
    * **Returns:** The number of channels allocated.
 
 * **Mix_Volume:** Set the volume for any allocated channel. If channel is -1 then all channels at are set at once. The volume is applied during the final mix, along with the sample volume. So setting this volume to 64 will halve the output of all samples played on the specified channel. All channels default to a volume of 128, which is the max. Newly allocated channels will have the max volume set, so setting all channels volumes does not affect subsequent channel allocations.
-   * **Function:** int *Mix_Volume*(int channel, int volume)
+   * **Function:** *int **Mix_Volume**(int channel, int volume)*
    ```c
    Mix_Volume(channel, volume)
-   // int channel: Channel to set mix volume for. -1 will set the volume for all allocated channels.
-   // int volume: The volume to use from 0 to MIX_MAX_VOLUME(128). If less than 0 then the volume will not be set.
+   // int channel: Channel to set mix volume for. -1 will set the volume for all allocated channels
+   // int volume: The volume to use from 0 to MIX_MAX_VOLUME(128). If less than 0 then the volume will not be set
    ```
    * **Return:** Current volume of the channel. If channel is -1, the average volume is returned.
 
 * **Mix_PlayChannel:** Play chunk on channel, or if channel is -1, pick the first free unreserved channel. The sample will play for loops+1 number of times, unless stopped by halt, or fade out, or setting a new expiration time of less time than it would have originally taken to play the loops, or closing the mixer.
-   * **Function:** int *Mix_PlayChannel*(int channel, Mix_Chunk *chunk, int loops)
+   * **Function:** *int **Mix_PlayChannel**(int channel, Mix_Chunk *chunk, int loops)*
    ```c
    Mix_PlayChannel(channel, fx[id - 1], repeat);
-   // int channel: Channel to play on, or -1 for the first free unreserved channel.
+   // int channel: Channel to play on, or -1 for the first free unreserved channel
    // Mix_Chunk * chunk: Sample to play
-   // int loops: Number of loops, -1 is infinite loops, passing one here plays the sample twice (1 loop).
+   // int loops: Number of loops, -1 is infinite loops, passing one here plays the sample twice (1 loop)
    ```
    * **Return:** The channel the sample is played on. On any errors, -1 is returned.
 
 * **Mix_Playing:** Tells you if channel is playing, or not.
-   * **Function:** int *Mix_Playing*(int channel)
+   * **Function:** *int **Mix_Playing**(int channel)*
    ```c
    Mix_Playing(channel)
-   // int channel: Channel to test whether it is playing or not.
-   // -1 will tell you how many channels are playing.
+   // int channel: Channel to test whether it is playing or not,
+   // -1 will tell you how many channels are playing
    ```
    * **Return:** Zero if the channel is not playing. Otherwise if you passed in -1, the number of channels playing is returned. If you passed in a specific channel, then 1 is returned if it is playing.
 
+#### Music
 
+* **Mix_FadeInMusic:** Fade in over ms milliseconds of time, the loaded music, playing it loop times through from start to finish.
+The fade in effect only applies to the first loop. Any previous music will be halted, or if it is fading out it will wait (blocking) for the fade to complete.
+   * **Function:** *int **Mix_FadeInMusic**(Mix_Music *music, int loops, int ms)*
+   ```c
+   if(Mix_FadeInMusic(music, -1, (int) (fadeTime * 1000.0f)) < 0)
+   {
+	LOG("Cannot fade in music %s. Mix_GetError(): %s", path, Mix_GetError());
+	ret = false;
+   }
+   // Mix_Music *music: Pointer to Mix_Music to play
+   // int loops: Number of times to play through the music, -1 plays the music forever
+   // int ms: Milliseconds for the fade-in effect to complete
+   ```
+   * **Return:** 0 on success, or -1 on errors.
+ 
+* **Mix_FadeOutMusic:** Gradually fade out the music over ms milliseconds starting from now. The music will be halted after the fade out is completed. Only when music is playing and not fading already are set to fade out, including paused channels.
+   * **Function:** *int **Mix_FadeOutMusic**(int ms)*
+    ```c
+    Mix_FadeOutMusic(int(fadeTime * 1000.0f));
+    // int ms: Milliseconds of time that the fade-out effect should take to go to silence, starting now
+    ```
+   * **Return:** 1 on success, 0 on failure.
 
-
+* **Mix_VolumeMusic:** Set the volume to volume, if it is 0 or greater, and return the previous volume setting. Setting the volume during a fade will not work.
+   * **Function:**  *int **Mix_VolumeMusic**(int volume)*
+   ```c
+   Mix_VolumeMusic(volumeMusic);
+   // int volume: Music volume, from 0 to MIX_MAX_VOLUME(128)
+   ```
+   * **Return:** The previous volume setting.
 
 
 

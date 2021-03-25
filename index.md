@@ -116,7 +116,8 @@ The fade in effect only applies to the first loop. Any previous music will be ha
    * **Function:** *int **Mix_FadeOutMusic**(int ms)*
     ```c
     Mix_FadeOutMusic(int(fadeTime * 1000.0f));
-    // int ms: Milliseconds of time that the fade-out effect should take to go to silence, starting now
+    // int ms: Milliseconds of time that the fade-out effect should 
+    // take to go to silence, starting now
     ```
    * **Return:** 1 on success, 0 on failure.
 
@@ -128,6 +129,20 @@ The fade in effect only applies to the first loop. Any previous music will be ha
    ```
    * **Return:** The previous volume setting.
 
+#### Effects
+
+* **Mix_SetPosition:** This effect emulates a simple 3D audio effect. It's not all that realistic, but it can help improve some level of realism. By giving it the angle and distance from the camera's point of view, the effect pans and attenuates volumes. If you are looking for better positional audio, using OpenAL is suggested.
+   * **Function:** *int **Mix_SetPosition**(int channel, Sint16 angle, Uint8 distance)*
+   ```c
+   Mix_SetPosition(channel, angle, distance);
+   // int channel: Channel number to register this effect on,
+   // Use MIX_CHANNEL_POST to process the postmix stream
+   // Sint16 angle: Direction in relation to forward from 0 to 360 degrees,
+   // larger angles will be reduced to this range using angles % 360,
+   // 0 = directly in front / 90 = directly to the right / 180 = directly behind / 270 = directly to the left
+   // Uint8 distance: The distance from the listener, from 0(near/loud) to 255(far/quiet) 
+   ```
+   * **Return:** Zero on errors, such as an invalid channel.
 
 
 

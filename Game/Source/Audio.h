@@ -11,7 +11,7 @@ struct Mix_Chunk;
 class Audio : public Module
 {
 public:
-
+	//Constructor
 	Audio();
 
 	// Destructor
@@ -31,6 +31,7 @@ public:
 	void ResumeMusic();
 	void StopMusic();
 	void RewindMusic();
+
 	void MusicPos(double second);
 	void SetMusicVolume(int volume);
 
@@ -39,13 +40,17 @@ public:
 
 	// Play a previously loaded WAV
 	bool PlayFx(int channel, unsigned int fx, int repeat = 0, int volume = -1);
+
 	void SetDistanceFx(int channel, int angle, uint distance, uint maxDistance);
 	int SetChannel();
+
 	void DeleteChannel();
 	bool RemoveChannel();
+
 	void PauseFx(int channel);
 	void ResumeFx(int channel);
 	void StopFx(int channel);
+
 	void ChangeMusicVolume(int volume);
 	void ChangeFxVolume(int volume);
 

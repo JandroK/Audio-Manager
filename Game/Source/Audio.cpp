@@ -203,7 +203,7 @@ bool Audio::PlayFx(int channel, unsigned int id, int repeat, int volume)
 
 	if(id > 0 && id <= fx.Count())
 	{
-		// If (channel == -1) check all channels
+		// If Mix_Playing(-1) check all channels
 		// TODO 3: Check if the channel isn't playing
 		if (Mix_Playing(channel) == 0)
 		{

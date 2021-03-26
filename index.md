@@ -682,7 +682,7 @@ bool Scene::Update(float dt)
 
 ## Conclusions
 
-The Audio and Music Manager is a very simple way to control all the sound that is played in your game. In a very easy way you can achieve more realistic results that provide a better gameplay to the gaming experience. But if you really are interested into this, I encourage you to test for yourself OpenAL and have a little fun with it. It is a tool created specifically to work with 3D audio so it will multiply the level we were able to reach today for sure!
+The Audio and Music Manager is a very simple way to control all the sound that is played in your game. In a very easy way you can achieve more realistic results that provide a better gameplay to the gaming experience. But if you really are interested into this, I encourage you to test for yourself [OpenAL](https://www.openal.org) and have a little fun with it. It is a tool created specifically to work with 3D audio so it will multiply the level we were able to reach today for sure!
 
 Thank you for your time and hope you were able to learn something from this guide. Until next time!
 

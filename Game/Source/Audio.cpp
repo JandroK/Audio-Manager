@@ -260,6 +260,7 @@ bool Audio::RemoveChannel()
 	{
 		numChannels = 0;
 		maxNumChannels = 10;
+		Mix_AllocateChannels(0);
 		Mix_AllocateChannels(maxNumChannels);
 		pendingToDelete = false;
 

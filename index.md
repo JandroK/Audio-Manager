@@ -441,4 +441,48 @@ void Audio::StopFx(int channel)
 {
 	Mix_HaltChannel(channel);
 }
+
+// Load/Save
+bool Audio::LoadState(pugi::xml_node& node)
+{
+	volumeMusic = node.child("music").attribute("volume").as_int(volumeMusic);
+	volumeFx = node.child("fx").attribute("volume").as_int(volumeFx);
+	Mix_VolumeMusic(volumeMusic);
+	return true;
+}
+bool Audio::SaveState(pugi::xml_node& node) const
+{
+	node.child("music").attribute("volume").set_value(volumeMusic);
+	node.child("fx").attribute("volume").set_value(volumeFx);
+	return true;
+}
 ```
+
+## Exercises - TODO's
+
+Now that we have reviewed the functions and concepts we will use, we can start with the exercise. The program is a bullet system in which each entity is assigned a different channel. All bullets spawn from the center of the screen and depending on the direction in which they go the listener will be heard from one direction or another, thus getting to check the spatial sound in 360 degrees. 
+
+There are three ways to spawn bullets:
+
+* The space key: Spawn a bullet to the east, and the next one has an offset of 10 degrees.
+
+![](/docs/Images/spawn_bullet_space_key.png)
+
+* The mouse button: Spawn a bullet towards the direction of the mouse position.
+
+![](docs/Images/spawn_bullet_mouse_button.png)
+
+* The A key: Spaw 36 bullets in all directions forming a perfect circle.
+
+![](docs/Images/spawn_bullet_a_key.png)
+
+
+
+
+
+
+
+
+
+
+

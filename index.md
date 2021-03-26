@@ -672,9 +672,28 @@ bool Scene::Update(float dt)
 		app->audio->ChangeMusicVolume(10);
 	if (app->input->GetKey(SDL_SCANCODE_KP_MINUS) == KEY_DOWN)
 		app->audio->ChangeMusicVolume(-10);
+		
 	if (app->input->GetKey(SDL_SCANCODE_UP) == KEY_DOWN)
 		app->audio->ChangeFxVolume(10);
 	if (app->input->GetKey(SDL_SCANCODE_DOWN) == KEY_DOWN)
 		app->audio->ChangeFxVolume(-10);
 }
 ```
+
+## Conclusions
+
+The Audio and Music Manager is a very simple way to control all the sound that is played in your game. In a very easy way you can achieve more realistic results that provide a better gameplay to the gaming experience. But if you really are interested into this, I encourage you to test for yourself OpenAL and have a little fun with it. It is a tool created specifically to work with 3D audio so it will multiply the level we were able to reach today for sure!
+
+Thank you for your time and hope you were able to learn something from this guide. Until next time!
+
+## Documentation
+
+[SDL_Mixer_PDF](https://www.libsdl.org/projects/SDL_mixer/docs/SDL_mixer.pdf)
+
+[SDL_Mixer_Doc](https://www.libsdl.org/projects/SDL_mixer/docs/SDL_mixer_6.html)
+
+[Gamasutra](https://www.gamasutra.com/blogs/RobBridgett/20190619/344991/The_Positive_Future_of_Spatial_Audio_for_Games.php)
+
+[GameDev](https://www.gamedev.net/forums/topic/537789-sdl-mix_setdistance-issue/)
+
+[GDC Conference](https://www.youtube.com/watch?v=L2Kckjq0Gcs)

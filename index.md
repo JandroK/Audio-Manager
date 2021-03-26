@@ -476,7 +476,48 @@ There are three ways to spawn bullets:
 
 ![](docs/Images/spawn_bullet_a_key.png)
 
+#### TODO 1: 
 
+Activate stereo mode. This TODO is for the developer to know that if the stereo mode is not activated they will not get a 3D sound. All you have to do is change the third input parameter of the function to the number 2 that is now.
+
+```c
+bool Audio::Awake(pugi::xml_node& config)
+{
+	// TODO 1: Activate stereo mode
+	if(Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+	{
+		LOG("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+		active = false;
+		ret = true;
+	}
+}
+```
+
+#### TODO 2:
+
+Create as many channels as you need and and free them. With this function the developer will be able to create as many channels as he needs so that the audio manager can then mix them. Finally release the channels.
+
+```c
+bool Audio::Awake(pugi::xml_node& config)
+{
+	// TODO 2: Create as many channels as you need 
+	int result = Mix_AllocateChannels(maxNumChannels);
+	if (result < 0)
+	{
+		fprintf(stderr, "Unable to allocate mixing channels: %s\n", SDL_GetError());
+		active = false;
+		ret = true;
+	}
+}
+
+bool Audio::CleanUp()
+{
+	// TODO 2: Free all channels
+	Mix_AllocateChannels(0);
+}
+```
+
+#### TODO 3:
 
 
 

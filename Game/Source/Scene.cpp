@@ -124,6 +124,7 @@ bool Scene::Update(float dt)
 		app->audio->ChangeMusicVolume(10);
 	if (app->input->GetKey(SDL_SCANCODE_KP_MINUS) == KEY_DOWN)
 		app->audio->ChangeMusicVolume(-10);
+
 	if (app->input->GetKey(SDL_SCANCODE_UP) == KEY_DOWN)
 		app->audio->ChangeFxVolume(10);
 	if (app->input->GetKey(SDL_SCANCODE_DOWN) == KEY_DOWN)

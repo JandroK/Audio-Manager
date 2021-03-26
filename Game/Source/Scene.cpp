@@ -119,7 +119,7 @@ bool Scene::Update(float dt)
 		app->audio->SetDistanceFx(item->data->channel, item->data->angle + 90, DistanceToListener(player, item->data->pos), WINDOW_WIDTH/2);
 	}
 
-	// TODO 10: Up/Down Music
+	// TODO 7: Up/Down Music
 	if (app->input->GetKey(SDL_SCANCODE_KP_PLUS) == KEY_DOWN)
 		app->audio->ChangeMusicVolume(10);
 	if (app->input->GetKey(SDL_SCANCODE_KP_MINUS) == KEY_DOWN)
@@ -149,10 +149,10 @@ bool Scene::Update(float dt)
 		}
 	}
 
-	// If an entity has been released a channel too
+	// TODO 6: If an entity has been released a channel too
 	if (app->audio->GetPendingToDelete() == true)
 	{
-		// TODO 8: If no channel is playing reassign the channels 
+		// TODO 6: If no channel is playing reassign the channels 
 		if (app->audio->RemoveChannel())
 		{
 			for (item = bullets.start; item != NULL; item = item->next)
@@ -213,7 +213,7 @@ void Scene::AddBullet(float angle)
 	else 
 		b->angle = angle;
 
-	// TODO 6: Assign new channel
+	// TODO 3: Assign new channel
 	b->channel = app->audio->SetChannel();
 }
 
@@ -236,7 +236,7 @@ void Scene::DeleteBody(Bullet* body)
 		if (item->data == body)
 		{
 			bullets.Del(item);
-			// TODO 9: Notify the audio manager that a channel can be released 
+			// TODO 7: Notify the audio manager that a channel can be released 
 			app->audio->DeleteChannel();
 			break;
 		}

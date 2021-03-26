@@ -290,7 +290,7 @@ In this section we will explain the functions related to "spatial audio" and cha
    	if(id > 0 && id <= fx.Count())
    	{
    		// If Mix_Playing(-1) check all channels
-   		// TODO 3: Check if the channel isn't playing
+   		// TODO 4: Check if the channel isn't playing
    		if (Mix_Playing(channel) == 0)
    		{
    			// TODO 4: Check if volume is hardcoded and 
@@ -412,7 +412,7 @@ void Audio::SetMusicVolume(int volume)
 	Mix_VolumeMusic(volume);
 }
 
-// TODO 10: Up/Down Music volume 
+// TODO 7: Up/Down Music volume 
 void Audio::ChangeMusicVolume(int volume)
 {
 	volumeMusic += volume;
@@ -420,7 +420,7 @@ void Audio::ChangeMusicVolume(int volume)
 	if (volumeMusic < 0) volumeMusic = 0;
 	Mix_VolumeMusic(volumeMusic);
 }
-// TODO 10: Up/Down Fx volume 
+// TODO 7: Up/Down Fx volume 
 void Audio::ChangeFxVolume(int volume)
 {
 	volumeFx += volume;
@@ -519,11 +519,162 @@ bool Audio::CleanUp()
 
 #### TODO 3:
 
+Create the SetChannel() function: Assign a different channel to each entity and when all available channels are assigned the function must create 10 new ones and call it to the entity system
 
+```c
+// TODO 3: Assign a different channel to each entity and when all available channels 
+// are assigned the function must create 10 new ones
+int Audio::SetChannel()
+{
+	if (numChannels < maxNumChannels - 1)
+	{
+		numChannels++;
+		return numChannels;
+	}
+	else
+	{
+		maxNumChannels += 10;
+		Mix_AllocateChannels(maxNumChannels);
+		numChannels++;
+		return numChannels;
+	}
 
+	return -1;
+}
 
+void Scene::AddBullet(float angle)
+{
+	// TODO 3: Assign new channel
+	b->channel = app->audio->SetChannel();
+}
+```
 
+#### TODO 4
 
+You must create a control system that verifies if the channel isn't playing, in this case, check if volume is hardcoded and lower the volume if the channel volume is higher than the maximum volume.
 
+```c
+// TODO 4: Check if the channel isn't playing
+if (Mix_Playing(channel) == 0)
+{
+	// TODO 4: Check if volume is hardcoded and 
+	// lower the volume if the channel volume is higher than the maximum volume  
+	if (volume != -1) Mix_Volume(channel, volume);
+	if (Mix_Volume(channel, -1) > volumeFx) 
+		Mix_Volume(channel, volumeFx);
+	Mix_PlayChannel(channel, fx[id - 1], repeat);
+}
+```
 
+#### TODO 5
 
+Once each entity has its own channel we are going to create the SetDistanceFx() function that will be in charge of simulating the spatial audio. In the gameplay scene must fill the input parameters required by the function.
+
+```c
+// TODO 5: Assign the distance and direction to which the entity of the listener is located 
+// 0 = very close, 254 = far away, 255 = out of range (Volume = 0)
+void Audio::SetDistanceFx(int channel, int angle, uint distance, uint maxDistance)
+{
+	distance = distance * 255 / maxDistance;
+	if (distance > 255) distance = 255;
+	Mix_SetPosition(channel, angle, distance);
+}
+
+bool Scene::Update(float dt)
+{
+	// TODO 5: Update distance and direction
+	// 0 = directly in front / 90 = directly to the right / 180 = directly behind / 270 = directly to the left.
+	for (item = bullets.start; item != NULL; item = item->next)
+	{
+		app->audio->SetDistanceFx(item->data->channel, item->data->angle + 90, DistanceToListener(player, item->data->pos), WINDOW_WIDTH/2);
+	}	
+}
+
+```
+
+#### TODO 6
+
+Notify the audio manager that a channel can be released. When it receives the warning it sets the boolean variable to true, then, the scene will receive this notice back and ask the audio manager if no channel is playing, if so, the audio manager restart channels as they were at the beginning and channels will be reassigned.
+
+```c
+void Scene::DeleteBody(Bullet* body)
+{
+	// TODO 6: Notify the audio manager that a channel can be released 
+	app->audio->DeleteChannel();
+}
+
+// TODO 6: Activate the boolean variable 
+void Audio::DeleteChannel()
+{
+	pendingToDelete = true;
+}
+
+bool Scene::Update(float dt)
+{
+	// TODO 6: If an entity has been released a channel too
+	if (app->audio->GetPendingToDelete() == true)
+	{
+		// TODO 6: If no channel is playing reassign the channels 
+		if (app->audio->RemoveChannel())
+		{
+			for (item = bullets.start; item != NULL; item = item->next)
+			{
+				item->data->channel = app->audio->SetChannel();
+			}
+		}
+	}
+
+}
+
+// TODO 6: Restart channels as they were at the beginning
+bool Audio::RemoveChannel()
+{
+	if (Mix_Playing(-1) == 0)
+	{
+		numChannels = 0;
+		maxNumChannels = 10;
+		Mix_AllocateChannels(0);
+		Mix_AllocateChannels(maxNumChannels);
+		pendingToDelete = false;
+
+		return true;
+	}
+
+	return false;
+}
+```
+
+#### TODO 7
+
+Finally and as an extra, you will have to create a function to regulate the general volume of the music and the Fx. To check that it works, try calling them from the gameplay scene.  
+
+```c
+// TODO 7: Up/Down Music volume 
+void Audio::ChangeMusicVolume(int volume)
+{
+	volumeMusic += volume;
+	if (volumeMusic > MIX_MAX_VOLUME) volumeMusic = MIX_MAX_VOLUME;
+	if (volumeMusic < 0) volumeMusic = 0;
+	Mix_VolumeMusic(volumeMusic);
+}
+// TODO 7: Up/Down Fx volume 
+void Audio::ChangeFxVolume(int volume)
+{
+	volumeFx += volume;
+	if (volumeFx > MIX_MAX_VOLUME) volumeFx = MIX_MAX_VOLUME;
+	if (volumeFx < 0) volumeFx = 0;
+}
+
+bool Scene::Update(float dt)
+{
+	// TODO 7: Up/Down Music
+	if (app->input->GetKey(SDL_SCANCODE_KP_PLUS) == KEY_DOWN)
+		app->audio->ChangeMusicVolume(10);
+	if (app->input->GetKey(SDL_SCANCODE_KP_MINUS) == KEY_DOWN)
+		app->audio->ChangeMusicVolume(-10);
+	if (app->input->GetKey(SDL_SCANCODE_UP) == KEY_DOWN)
+		app->audio->ChangeFxVolume(10);
+	if (app->input->GetKey(SDL_SCANCODE_DOWN) == KEY_DOWN)
+		app->audio->ChangeFxVolume(-10);
+}
+```

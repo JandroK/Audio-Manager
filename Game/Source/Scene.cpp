@@ -236,7 +236,7 @@ void Scene::DeleteBody(Bullet* body)
 		if (item->data == body)
 		{
 			bullets.Del(item);
-			// TODO 7: Notify the audio manager that a channel can be released 
+			// TODO 6: Notify the audio manager that a channel can be released 
 			app->audio->DeleteChannel();
 			break;
 		}

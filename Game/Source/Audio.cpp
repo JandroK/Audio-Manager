@@ -248,7 +248,7 @@ void Audio::SetDistanceFx(int channel, int angle, uint distance, uint maxDistanc
 	Mix_SetPosition(channel, angle, distance);
 }
 
-// TODO 6: DeleteChannel 
+// TODO 6: Activate the boolean variable 
 void Audio::DeleteChannel()
 {
 	pendingToDelete = true;

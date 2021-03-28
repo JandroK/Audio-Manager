@@ -12,7 +12,7 @@ The main focus of this research is:
 * Every entity can potentially generate audio
 * Discard entities that are too far
 * Check camera position/zoom to play the audio spatially
-* Music Manager: Chain a playlist with fading
+* Music Manager: Chain a music with fading
 
 ## Music Manager
 

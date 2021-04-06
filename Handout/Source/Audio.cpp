@@ -54,7 +54,7 @@ bool Audio::Awake(pugi::xml_node& config)
 
 	// Initialize SDL_mixer
 	// TODO 1: Activate stereo mode
-	if(Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+	if(Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 1, 2048) < 0)
 	{
 		LOG("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
 		active = false;
@@ -62,13 +62,6 @@ bool Audio::Awake(pugi::xml_node& config)
 	}
 
 	// TODO 2: Create as many channels as you need 
-	int result = Mix_AllocateChannels(maxNumChannels);
-	if (result < 0)
-	{
-		fprintf(stderr, "Unable to allocate mixing channels: %s\n", SDL_GetError());
-		active = false;
-		ret = true;
-	}
 
 	return ret;
 }
@@ -89,7 +82,6 @@ bool Audio::CleanUp()
 	UnloadFxs();
 
 	// TODO 2: Free all channels
-	Mix_AllocateChannels(0);
 
 	Mix_CloseAudio();
 	Mix_Quit();
@@ -205,15 +197,12 @@ bool Audio::PlayFx(int channel, unsigned int id, int repeat, int volume)
 	{
 		// If Mix_Playing(-1) check all channels
 		// TODO 4: Check if the channel isn't playing
-		if (Mix_Playing(channel) == 0)
-		{
+
 			// TODO 4: Check if volume is hardcoded and 
 			// lower the volume if the channel volume is higher than the maximum volume  
-			if (volume != -1) Mix_Volume(channel, volume);
-			if (Mix_Volume(channel, -1) > volumeFx) 
-				Mix_Volume(channel, volumeFx);
-			Mix_PlayChannel(channel, fx[id - 1], repeat);
-		}
+
+			Mix_PlayChannel(-1, fx[id - 1], repeat);
+		
 	}
 
 	return ret;
@@ -223,19 +212,6 @@ bool Audio::PlayFx(int channel, unsigned int id, int repeat, int volume)
 // are assigned the function must create 10 new ones
 int Audio::SetChannel()
 {
-	if (numChannels < maxNumChannels - 1)
-	{
-		numChannels++;
-		return numChannels;
-	}
-	else
-	{
-		maxNumChannels += 10;
-		Mix_AllocateChannels(maxNumChannels);
-		numChannels++;
-		return numChannels;
-	}
-
 	return -1;
 }
 
@@ -243,30 +219,17 @@ int Audio::SetChannel()
 // 0 = very close, 254 = far away, 255 = out of range (Volume = 0)
 void Audio::SetDistanceFx(int channel, int angle, uint distance, uint maxDistance)
 {
-	distance = distance * 255 / maxDistance;
-	if (distance > 255) distance = 255;
-	Mix_SetPosition(channel, angle, distance);
+
 }
 
 // TODO 6: Activate the boolean variable 
 void Audio::DeleteChannel()
 {
-	pendingToDelete = true;
+	
 }
 // TODO 6: Restart channels as they were at the beginning
 bool Audio::RemoveChannel()
 {
-	if (Mix_Playing(-1) == 0)
-	{
-		numChannels = 0;
-		maxNumChannels = 10;
-		Mix_AllocateChannels(0);
-		Mix_AllocateChannels(maxNumChannels);
-		pendingToDelete = false;
-
-		return true;
-	}
-
 	return false;
 }
 
@@ -301,17 +264,12 @@ void Audio::SetMusicVolume(int volume)
 // TODO 7: Up/Down Music volume 
 void Audio::ChangeMusicVolume(int volume)
 {
-	volumeMusic += volume;
-	if (volumeMusic > MIX_MAX_VOLUME) volumeMusic = MIX_MAX_VOLUME;
-	if (volumeMusic < 0) volumeMusic = 0;
-	Mix_VolumeMusic(volumeMusic);
+
 }
 // TODO 7: Up/Down Fx volume 
 void Audio::ChangeFxVolume(int volume)
 {
-	volumeFx += volume;
-	if (volumeFx > MIX_MAX_VOLUME) volumeFx = MIX_MAX_VOLUME;
-	if (volumeFx < 0) volumeFx = 0;
+
 }
 
 // Extra functions Fx

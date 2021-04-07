@@ -144,7 +144,7 @@ The fade in effect only applies to the first loop. Any previous music will be ha
    ```
    * **Return:** Zero on errors, such as an invalid channel.
 
-## Audio Manger Functions
+## Audio Manager Functions
 
 The audio manager uses all the following functions: 
 

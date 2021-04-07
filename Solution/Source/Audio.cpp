@@ -62,13 +62,7 @@ bool Audio::Awake(pugi::xml_node& config)
 	}
 
 	// TODO 2: Create as many channels as you need 
-	int result = Mix_AllocateChannels(maxNumChannels);
-	if (result < 0)
-	{
-		fprintf(stderr, "Unable to allocate mixing channels: %s\n", SDL_GetError());
-		active = false;
-		ret = true;
-	}
+	Mix_AllocateChannels(maxNumChannels);
 
 	return ret;
 }

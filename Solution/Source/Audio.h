@@ -44,7 +44,7 @@ public:
 	void SetDistanceFx(int channel, int angle, uint distance, uint maxDistance);
 	int SetChannel();
 
-	void DeleteChannel();
+	void DeleteChannel(int channel);
 	bool RemoveChannel();
 
 	void PauseFx(int channel);
@@ -66,6 +66,7 @@ private:
 
 	_Mix_Music* music;
 	List<Mix_Chunk *>	fx;
+	List<int> channels;
 
 	// TODO: Create the varaibles you need
 	int maxNumChannels = 10;

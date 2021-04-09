@@ -84,6 +84,7 @@ bool Audio::CleanUp()
 
 	// TODO 2: Free all channels
 	Mix_AllocateChannels(0);
+	channels.Clear();
 
 	Mix_CloseAudio();
 	Mix_Quit();
@@ -217,20 +218,29 @@ bool Audio::PlayFx(int channel, unsigned int id, int repeat, int volume)
 // are assigned the function must create 10 new ones
 int Audio::SetChannel()
 {
-	if (numChannels < maxNumChannels - 1)
+	int ret = -1;
+	if (channels.Count() != 0)
 	{
-		numChannels++;
-		return numChannels;
+		ret = channels.start->data;
+		channels.Del(channels.start);
 	}
 	else
 	{
-		maxNumChannels += 10;
-		Mix_AllocateChannels(maxNumChannels);
-		numChannels++;
-		return numChannels;
-	}
+		if (numChannels < maxNumChannels - 1)
+		{
+			numChannels++;
+			return numChannels;
+		}
+		else
+		{
+			maxNumChannels += 10;
+			Mix_AllocateChannels(maxNumChannels);
+			numChannels++;
+			return numChannels;
+		}
+	}	
 
-	return -1;
+	return ret;
 }
 
 // TODO 5: Assign the distance and direction to which the entity of the listener is located 
@@ -243,25 +253,9 @@ void Audio::SetDistanceFx(int channel, int angle, uint distance, uint maxDistanc
 }
 
 // TODO 6: Activate the boolean variable 
-void Audio::DeleteChannel()
+void Audio::DeleteChannel(int channel)
 {
-	pendingToDelete = true;
-}
-// TODO 6: Restart channels as they were at the beginning
-bool Audio::RemoveChannel()
-{
-	if (Mix_Playing(-1) == 0)
-	{
-		numChannels = 0;
-		maxNumChannels = 10;
-		Mix_AllocateChannels(0);
-		Mix_AllocateChannels(maxNumChannels);
-		pendingToDelete = false;
-
-		return true;
-	}
-
-	return false;
+	channels.Add(channel);
 }
 
 // Extra functions Music

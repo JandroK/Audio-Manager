@@ -149,19 +149,6 @@ bool Scene::Update(float dt)
 			item->data->pendingToDelete = true;
 		}
 	}
-
-	// TODO 6: If an entity has been released a channel too
-	if (app->audio->GetPendingToDelete() == true)
-	{
-		// TODO 6: If no channel is playing reassign the channels 
-		if (app->audio->RemoveChannel())
-		{
-			for (item = bullets.start; item != NULL; item = item->next)
-			{
-				item->data->channel = app->audio->SetChannel();
-			}
-		}
-	}
 	
 	return true;
 }
@@ -236,9 +223,9 @@ void Scene::DeleteBody(Bullet* body)
 	{
 		if (item->data == body)
 		{
-			bullets.Del(item);
 			// TODO 6: Notify the audio manager that a channel can be released 
-			app->audio->DeleteChannel();
+			app->audio->DeleteChannel(item->data->channel);
+			bullets.Del(item);
 			break;
 		}
 	}

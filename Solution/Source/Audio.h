@@ -33,7 +33,7 @@ public:
 	void RewindMusic();
 
 	void MusicPos(double second);
-	void SetMusicVolume(int volume);
+	void SetVolumeMusic(int volume);
 
 	// Load a WAV in memory
 	unsigned int LoadFx(const char* path);
@@ -45,7 +45,6 @@ public:
 	int SetChannel();
 
 	void DeleteChannel(int channel);
-	bool RemoveChannel();
 
 	void PauseFx(int channel);
 	void ResumeFx(int channel);
@@ -60,7 +59,11 @@ public:
 
 	// Return volume music
 	int GetVolumeMusic() { return volumeMusic; }
+	int GetVolumeFx() { return volumeFx; }
 	bool GetPendingToDelete() { return pendingToDelete; }
+
+	// Set Volume
+	void SetVolumeFx(int volume) { volumeFx = volume; }
 
 private:
 

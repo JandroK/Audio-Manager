@@ -281,9 +281,10 @@ void Audio::MusicPos(double second)
 	Mix_SetMusicPosition(second);
 }
 // Set the volume to volume
-void Audio::SetMusicVolume(int volume)
+void Audio::SetVolumeMusic(int volume)
 {
-	Mix_VolumeMusic(volume);
+	volumeMusic = volume;
+	Mix_VolumeMusic(volumeMusic);
 }
 
 // TODO 7: Up/Down Music volume 
